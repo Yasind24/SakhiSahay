@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: SakhiSahay API - One Stop Centres directory
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: oscs
+    description: One Stop Centre operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,116 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /oscs:
+    get:
+      operationId: listOscs
+      tags: [oscs]
+      summary: List all OSCs
+      description: Returns paginated list of One Stop Centres with optional filters
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: district
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: List of OSCs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OscListResponse"
+
+  /oscs/stats:
+    get:
+      operationId: getOscStats
+      tags: [oscs]
+      summary: Get OSC statistics
+      description: Returns aggregated statistics about OSCs across India
+      responses:
+        "200":
+          description: OSC statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OscStats"
+
+  /oscs/states:
+    get:
+      operationId: listStates
+      tags: [oscs]
+      summary: List all states with OSC counts
+      description: Returns all states that have OSCs along with counts
+      responses:
+        "200":
+          description: List of states
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StateListResponse"
+
+  /oscs/districts:
+    get:
+      operationId: listDistricts
+      tags: [oscs]
+      summary: List districts for a state
+      parameters:
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of districts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DistrictListResponse"
+
+  /oscs/{id}:
+    get:
+      operationId: getOsc
+      tags: [oscs]
+      summary: Get a single OSC by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OSC details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Osc"
+        "404":
+          description: OSC not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +146,123 @@ components:
       required:
         - status
 
+    Osc:
+      type: object
+      properties:
+        id:
+          type: integer
+        serialNo:
+          type: integer
+        state:
+          type: string
+        district:
+          type: string
+        administratorName:
+          type: string
+        administratorEmail:
+          type: string
+        address:
+          type: string
+      required:
+        - id
+        - serialNo
+        - state
+        - district
+        - administratorName
+
+    OscListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Osc"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required:
+        - data
+        - total
+        - page
+        - limit
+        - totalPages
+
+    StateSummary:
+      type: object
+      properties:
+        state:
+          type: string
+        count:
+          type: integer
+      required:
+        - state
+        - count
+
+    StateListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StateSummary"
+        total:
+          type: integer
+      required:
+        - data
+        - total
+
+    DistrictSummary:
+      type: object
+      properties:
+        district:
+          type: string
+        count:
+          type: integer
+      required:
+        - district
+        - count
+
+    DistrictListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DistrictSummary"
+        state:
+          type: string
+      required:
+        - data
+        - state
+
+    OscStats:
+      type: object
+      properties:
+        totalOscs:
+          type: integer
+        totalStates:
+          type: integer
+        totalDistricts:
+          type: integer
+        topStates:
+          type: array
+          items:
+            $ref: "#/components/schemas/StateSummary"
+      required:
+        - totalOscs
+        - totalStates
+        - totalDistricts
+        - topStates
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

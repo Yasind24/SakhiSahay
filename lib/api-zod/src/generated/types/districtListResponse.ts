@@ -5,7 +5,9 @@
  * SakhiSahay API - One Stop Centres directory
  * OpenAPI spec version: 0.1.0
  */
+import type { DistrictSummary } from "./districtSummary";
 
-export interface HealthStatus {
-  status: string;
+export interface DistrictListResponse {
+  data: DistrictSummary[];
+  state: string;
 }
