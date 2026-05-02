@@ -4,7 +4,7 @@ import { ALL_OSCS } from "../data/oscs.js";
 const router = Router();
 
 router.get("/oscs", (req, res) => {
-  const { state, district, search, page = "1", limit = "20" } = req.query as Record<string, string>;
+  const { state, district, q, page = "1", limit = "20" } = req.query as Record<string, string>;
 
   let filtered = ALL_OSCS;
 
@@ -16,13 +16,13 @@ router.get("/oscs", (req, res) => {
     filtered = filtered.filter(o => o.district.toLowerCase() === district.toLowerCase());
   }
 
-  if (search) {
-    const q = search.toLowerCase();
+  if (q) {
+    const query = q.toLowerCase();
     filtered = filtered.filter(o =>
-      o.state.toLowerCase().includes(q) ||
-      o.district.toLowerCase().includes(q) ||
-      o.administratorName.toLowerCase().includes(q) ||
-      (o.address ?? "").toLowerCase().includes(q)
+      o.state.toLowerCase().includes(query) ||
+      o.district.toLowerCase().includes(query) ||
+      o.name.toLowerCase().includes(query) ||
+      (o.address ?? "").toLowerCase().includes(query)
     );
   }
 
@@ -63,10 +63,10 @@ router.get("/oscs/states", (_req, res) => {
   for (const osc of ALL_OSCS) {
     stateMap.set(osc.state, (stateMap.get(osc.state) ?? 0) + 1);
   }
-  const data = [...stateMap.entries()]
+  const states = [...stateMap.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([state, count]) => ({ state, count }));
-  res.json({ data, total: data.length });
+  res.json({ states, total: states.length });
 });
 
 router.get("/oscs/districts", (req, res) => {
@@ -83,11 +83,11 @@ router.get("/oscs/districts", (req, res) => {
     }
   }
 
-  const data = [...distMap.entries()]
+  const districts = [...distMap.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([district, count]) => ({ district, count }));
 
-  res.json({ data, state });
+  res.json({ districts, state });
 });
 
 router.get("/oscs/:id", (req, res) => {
