@@ -6,6 +6,7 @@ import Home from "@/pages/Home";
 import Centres from "@/pages/Centres";
 import CentreDetail from "@/pages/CentreDetail";
 import States from "@/pages/States";
+import MapView from "@/pages/MapView";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/centres" component={Centres} />
       <Route path="/centres/:id" component={CentreDetail} />
       <Route path="/states" component={States} />
+      <Route path="/map" component={MapView} />
       <Route component={NotFound} />
     </Switch>
   );
