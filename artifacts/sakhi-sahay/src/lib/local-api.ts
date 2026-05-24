@@ -39,11 +39,82 @@ export interface MapResponse {
   total: number;
 }
 
+export interface OscStatsResponse {
+  totalOscs: number;
+  totalStates: number;
+  totalDistricts: number;
+  geocodedDistricts: number;
+  topStates: Array<{ state: string; count: number }>;
+}
+
+const SAMPLE_COORDINATE_MATCH_THRESHOLD = 0.6;
+
+function normalize(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokenScore(a: string, b: string): number {
+  const aTokens = new Set(normalize(a).split(" ").filter((token) => token.length > 2));
+  const bTokens = new Set(normalize(b).split(" ").filter((token) => token.length > 2));
+  if (!aTokens.size || !bTokens.size) return 0;
+
+  let intersection = 0;
+  for (const token of aTokens) {
+    if (bTokens.has(token)) intersection++;
+  }
+
+  return intersection / Math.max(aTokens.size, bTokens.size);
+}
+
+function isSampleCoordinateRow(osc: OscEntry): boolean {
+  return !osc.name && !osc.email && typeof osc.lat === "number" && typeof osc.lon === "number";
+}
+
+function findMatchingSampleCoordinate(osc: OscEntry): OscEntry | undefined {
+  if (isSampleCoordinateRow(osc)) return undefined;
+
+  return ALL_OSCS
+    .filter(
+      (sample) =>
+        isSampleCoordinateRow(sample) &&
+        sample.state === osc.state &&
+        sample.district === osc.district &&
+        tokenScore(osc.address, sample.address) >= SAMPLE_COORDINATE_MATCH_THRESHOLD,
+    )
+    .sort((a, b) => tokenScore(osc.address, b.address) - tokenScore(osc.address, a.address))[0];
+}
+
+function isDuplicateSampleCoordinate(osc: OscEntry): boolean {
+  if (!isSampleCoordinateRow(osc)) return false;
+
+  return ALL_OSCS.some(
+    (candidate) =>
+      !isSampleCoordinateRow(candidate) &&
+      candidate.state === osc.state &&
+      candidate.district === osc.district &&
+      tokenScore(candidate.address, osc.address) >= SAMPLE_COORDINATE_MATCH_THRESHOLD,
+  );
+}
+
+function visibleOscs(): OscEntry[] {
+  return ALL_OSCS.filter((osc) => !isDuplicateSampleCoordinate(osc));
+}
+
 function getCoords(district: string, state: string) {
   return geoCache[`${district}|||${state}`] ?? null;
 }
 
 function withCoords(osc: OscEntry): OscWithCoords {
+  const sampleCoordinate = findMatchingSampleCoordinate(osc);
+  if (sampleCoordinate) {
+    return { ...osc, lat: sampleCoordinate.lat ?? null, lon: sampleCoordinate.lon ?? null };
+  }
+
   if (typeof osc.lat === "number" && typeof osc.lon === "number") {
     return { ...osc, lat: osc.lat, lon: osc.lon };
   }
@@ -59,7 +130,7 @@ export function getOscs(params: {
   limit?: number;
 }): OscsResponse {
   const { state, district, q } = params;
-  let filtered = ALL_OSCS;
+  let filtered = visibleOscs();
 
   if (state) {
     filtered = filtered.filter((osc) => osc.state.toLowerCase() === state.toLowerCase());
@@ -92,7 +163,7 @@ export function getOscs(params: {
 export function getStates(): StatesResponse {
   const stateMap = new Map<string, number>();
 
-  for (const osc of ALL_OSCS) {
+  for (const osc of visibleOscs()) {
     stateMap.set(osc.state, (stateMap.get(osc.state) ?? 0) + 1);
   }
 
@@ -106,7 +177,7 @@ export function getStates(): StatesResponse {
 export function getDistricts(state: string): DistrictsResponse {
   const districtMap = new Map<string, number>();
 
-  for (const osc of ALL_OSCS) {
+  for (const osc of visibleOscs()) {
     if (osc.state.toLowerCase() === state.toLowerCase()) {
       districtMap.set(osc.district, (districtMap.get(osc.district) ?? 0) + 1);
     }
@@ -121,8 +192,8 @@ export function getDistricts(state: string): DistrictsResponse {
 
 export function getMapOscs(state?: string): MapResponse {
   const oscs = state
-    ? ALL_OSCS.filter((osc) => osc.state.toLowerCase() === state.toLowerCase())
-    : ALL_OSCS;
+    ? visibleOscs().filter((osc) => osc.state.toLowerCase() === state.toLowerCase())
+    : visibleOscs();
 
   const data = oscs.flatMap((osc) => {
     const withLocation = withCoords(osc);
@@ -137,4 +208,33 @@ export function getMapOscs(state?: string): MapResponse {
 export function getOscById(id: number): OscWithCoords | undefined {
   const osc = ALL_OSCS.find((entry) => entry.id === id);
   return osc ? withCoords(osc) : undefined;
+}
+
+export function getOscStats(): OscStatsResponse {
+  const oscs = visibleOscs();
+  const stateMap = new Map<string, number>();
+  const districtSet = new Set<string>();
+
+  for (const osc of oscs) {
+    stateMap.set(osc.state, (stateMap.get(osc.state) ?? 0) + 1);
+    districtSet.add(`${osc.state}::${osc.district}`);
+  }
+
+  const topStates = [...stateMap.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([state, count]) => ({ state, count }));
+
+  const geocodedDistricts = oscs.filter((osc) => {
+    const withLocation = withCoords(osc);
+    return withLocation.lat !== null && withLocation.lon !== null;
+  }).length;
+
+  return {
+    totalOscs: oscs.length,
+    totalStates: stateMap.size,
+    totalDistricts: districtSet.size,
+    geocodedDistricts,
+    topStates,
+  };
 }

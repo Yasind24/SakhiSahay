@@ -83,7 +83,7 @@ export default function Centres() {
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-orange-900 mb-1">Find a Centre</h1>
           <p className="text-orange-700 text-sm">
-            {data ? `${data.total.toLocaleString()} centres found` : "Searching across 762 One Stop Centres"}
+            {data ? `${data.total.toLocaleString()} centres found` : "Searching One Stop Centres"}
           </p>
         </div>
 

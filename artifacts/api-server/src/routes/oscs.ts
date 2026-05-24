@@ -16,6 +16,7 @@ interface GeoEntry {
 type GeoCache = Record<string, GeoEntry | null>;
 
 let geoCache: GeoCache = {};
+const SAMPLE_COORDINATE_MATCH_THRESHOLD = 0.6;
 
 function loadGeoCache() {
   try {
@@ -34,7 +35,72 @@ function getCoords(district: string, state: string) {
   return geoCache[key] ?? null;
 }
 
+function normalize(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokenScore(a: string, b: string): number {
+  const aTokens = new Set(normalize(a).split(" ").filter((token) => token.length > 2));
+  const bTokens = new Set(normalize(b).split(" ").filter((token) => token.length > 2));
+  if (!aTokens.size || !bTokens.size) return 0;
+
+  let intersection = 0;
+  for (const token of aTokens) {
+    if (bTokens.has(token)) intersection++;
+  }
+
+  return intersection / Math.max(aTokens.size, bTokens.size);
+}
+
+function isSampleCoordinateRow(osc: { name: string; email: string; lat?: number; lon?: number }) {
+  return !osc.name && !osc.email && typeof osc.lat === "number" && typeof osc.lon === "number";
+}
+
+function findMatchingSampleCoordinate<T extends { state: string; district: string; address: string; name: string; email: string }>(osc: T) {
+  if (isSampleCoordinateRow(osc)) return undefined;
+
+  return ALL_OSCS
+    .filter(
+      (sample) =>
+        isSampleCoordinateRow(sample) &&
+        sample.state === osc.state &&
+        sample.district === osc.district &&
+        tokenScore(osc.address, sample.address) >= SAMPLE_COORDINATE_MATCH_THRESHOLD,
+    )
+    .sort((a, b) => tokenScore(osc.address, b.address) - tokenScore(osc.address, a.address))[0];
+}
+
+function isDuplicateSampleCoordinate(osc: { state: string; district: string; address: string; name: string; email: string; lat?: number; lon?: number }) {
+  if (!isSampleCoordinateRow(osc)) return false;
+
+  return ALL_OSCS.some(
+    (candidate) =>
+      !isSampleCoordinateRow(candidate) &&
+      candidate.state === osc.state &&
+      candidate.district === osc.district &&
+      tokenScore(candidate.address, osc.address) >= SAMPLE_COORDINATE_MATCH_THRESHOLD,
+  );
+}
+
+function visibleOscs() {
+  return ALL_OSCS.filter((osc) => !isDuplicateSampleCoordinate(osc));
+}
+
 function withCoords<T extends { district: string; state: string; lat?: number; lon?: number }>(osc: T) {
+  if ("name" in osc && "email" in osc && "address" in osc) {
+    const sampleCoordinate = findMatchingSampleCoordinate(
+      osc as T & { name: string; email: string; address: string },
+    );
+    if (sampleCoordinate) {
+      return { ...osc, lat: sampleCoordinate.lat ?? null, lon: sampleCoordinate.lon ?? null };
+    }
+  }
+
   if (typeof osc.lat === "number" && typeof osc.lon === "number") {
     return { ...osc, lat: osc.lat, lon: osc.lon };
   }
@@ -47,7 +113,7 @@ const router = Router();
 router.get("/oscs", (req, res) => {
   const { state, district, q, page = "1", limit = "20" } = req.query as Record<string, string>;
 
-  let filtered = ALL_OSCS;
+  let filtered = visibleOscs();
 
   if (state) {
     filtered = filtered.filter(o => o.state.toLowerCase() === state.toLowerCase());
@@ -77,11 +143,12 @@ router.get("/oscs", (req, res) => {
 });
 
 router.get("/oscs/stats", (_req, res) => {
-  const total = ALL_OSCS.length;
+  const oscs = visibleOscs();
+  const total = oscs.length;
   const stateMap = new Map<string, number>();
   const districtSet = new Set<string>();
 
-  for (const osc of ALL_OSCS) {
+  for (const osc of oscs) {
     stateMap.set(osc.state, (stateMap.get(osc.state) ?? 0) + 1);
     districtSet.add(`${osc.state}::${osc.district}`);
   }
@@ -91,11 +158,10 @@ router.get("/oscs/stats", (_req, res) => {
     .slice(0, 10)
     .map(([state, count]) => ({ state, count }));
 
-  const geocodedCount = ALL_OSCS.filter(
-    (osc) =>
-      (typeof osc.lat === "number" && typeof osc.lon === "number") ||
-      Boolean(getCoords(osc.district, osc.state)),
-  ).length;
+  const geocodedCount = oscs.filter((osc) => {
+    const withLocation = withCoords(osc);
+    return withLocation.lat !== null && withLocation.lon !== null;
+  }).length;
 
   res.json({
     totalOscs: total,
@@ -108,7 +174,7 @@ router.get("/oscs/stats", (_req, res) => {
 
 router.get("/oscs/states", (_req, res) => {
   const stateMap = new Map<string, number>();
-  for (const osc of ALL_OSCS) {
+  for (const osc of visibleOscs()) {
     stateMap.set(osc.state, (stateMap.get(osc.state) ?? 0) + 1);
   }
   const states = [...stateMap.entries()]
@@ -125,7 +191,7 @@ router.get("/oscs/districts", (req, res) => {
   }
 
   const distMap = new Map<string, number>();
-  for (const osc of ALL_OSCS) {
+  for (const osc of visibleOscs()) {
     if (osc.state.toLowerCase() === state.toLowerCase()) {
       distMap.set(osc.district, (distMap.get(osc.district) ?? 0) + 1);
     }
@@ -141,7 +207,7 @@ router.get("/oscs/districts", (req, res) => {
 // Map endpoint: return all OSCs that have coordinates (for the map view)
 router.get("/oscs/map", (req, res) => {
   const { state } = req.query as { state?: string };
-  let oscs = ALL_OSCS;
+  let oscs = visibleOscs();
   if (state) {
     oscs = oscs.filter(o => o.state.toLowerCase() === state.toLowerCase());
   }

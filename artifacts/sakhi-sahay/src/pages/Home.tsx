@@ -1,9 +1,16 @@
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Phone, MapPin, Search, ChevronRight, Heart, Shield, Users } from "lucide-react";
+import { getOscStats, type OscStatsResponse } from "@/lib/local-api";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 export default function Home() {
+  const { data: stats } = useQuery<OscStatsResponse>({
+    queryKey: ["osc-stats"],
+    queryFn: getOscStats,
+  });
+
   return (
     <div className="min-h-screen bg-[hsl(36,100%,97%)]">
       {/* Navbar */}
@@ -70,9 +77,9 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { value: "762", label: "Centres Listed", icon: MapPin },
-            { value: "35", label: "States & UTs", icon: Shield },
-            { value: "600+", label: "Districts", icon: Users },
+            { value: stats?.totalOscs.toLocaleString() ?? "—", label: "Centres Listed", icon: MapPin },
+            { value: stats?.totalStates.toLocaleString() ?? "—", label: "States & UTs", icon: Shield },
+            { value: stats?.totalDistricts.toLocaleString() ?? "—", label: "Districts", icon: Users },
             { value: "181", label: "Free Helpline", icon: Phone },
           ].map((stat) => (
             <div key={stat.label} className="bg-white rounded-2xl p-5 text-center border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
