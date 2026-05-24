@@ -14,4 +14,8 @@ export interface Osc {
   administratorName: string;
   administratorEmail?: string;
   address?: string;
+  /** @nullable */
+  lat: number | null;
+  /** @nullable */
+  lon: number | null;
 }

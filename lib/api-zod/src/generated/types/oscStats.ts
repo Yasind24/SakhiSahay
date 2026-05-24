@@ -11,5 +11,6 @@ export interface OscStats {
   totalOscs: number;
   totalStates: number;
   totalDistricts: number;
+  geocodedDistricts: number;
   topStates: StateSummary[];
 }

@@ -163,12 +163,22 @@ components:
           type: string
         address:
           type: string
+        lat:
+          type:
+            - number
+            - "null"
+        lon:
+          type:
+            - number
+            - "null"
       required:
         - id
         - serialNo
         - state
         - district
         - administratorName
+        - lat
+        - lon
 
     OscListResponse:
       type: object
@@ -249,6 +259,8 @@ components:
           type: integer
         totalDistricts:
           type: integer
+        geocodedDistricts:
+          type: integer
         topStates:
           type: array
           items:
@@ -257,6 +269,7 @@ components:
         - totalOscs
         - totalStates
         - totalDistricts
+        - geocodedDistricts
         - topStates
 
     ErrorResponse:

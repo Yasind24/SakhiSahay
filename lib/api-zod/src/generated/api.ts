@@ -40,6 +40,8 @@ export const ListOscsResponse = zod.object({
       administratorName: zod.string(),
       administratorEmail: zod.string().optional(),
       address: zod.string().optional(),
+      lat: zod.number().nullable(),
+      lon: zod.number().nullable(),
     }),
   ),
   total: zod.number(),
@@ -56,6 +58,7 @@ export const GetOscStatsResponse = zod.object({
   totalOscs: zod.number(),
   totalStates: zod.number(),
   totalDistricts: zod.number(),
+  geocodedDistricts: zod.number(),
   topStates: zod.array(
     zod.object({
       state: zod.string(),
@@ -110,4 +113,6 @@ export const GetOscResponse = zod.object({
   administratorName: zod.string(),
   administratorEmail: zod.string().optional(),
   address: zod.string().optional(),
+  lat: zod.number().nullable(),
+  lon: zod.number().nullable(),
 });

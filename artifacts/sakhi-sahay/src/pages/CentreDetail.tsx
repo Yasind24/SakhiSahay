@@ -2,18 +2,9 @@ import { Link } from "wouter";
 import { ArrowLeft, MapPin, Mail, Phone, User, Heart, ExternalLink, Copy, Check } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { getOscById, type OscWithCoords } from "@/lib/local-api";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
-const API_BASE = `${BASE}/api`;
-
-interface OscEntry {
-  id: number;
-  state: string;
-  district: string;
-  name: string;
-  email: string;
-  address: string;
-}
 
 interface Props {
   params: { id: string };
@@ -35,12 +26,13 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export default function CentreDetail({ params }: Props) {
-  const { data: osc, isLoading, error } = useQuery<OscEntry>({
+  const { data: osc, isLoading, error } = useQuery<OscWithCoords>({
     queryKey: ["osc", params.id],
-    queryFn: () => fetch(`${API_BASE}/oscs/${params.id}`).then(r => {
-      if (!r.ok) throw new Error("Not found");
-      return r.json();
-    }),
+    queryFn: () => {
+      const osc = getOscById(Number(params.id));
+      if (!osc) throw new Error("Not found");
+      return osc;
+    },
   });
 
   if (isLoading) {
@@ -121,7 +113,11 @@ export default function CentreDetail({ params }: Props) {
                 <div className="text-xs font-semibold text-orange-400 uppercase tracking-wide mb-1">Address</div>
                 <div className="text-orange-900 leading-relaxed text-sm">{osc.address}</div>
                 <a
-                  href={`https://maps.google.com/?q=${encodeURIComponent(`${osc.district} One Stop Centre ${osc.state} India`)}`}
+                  href={
+                    osc.lat !== null && osc.lon !== null
+                      ? `https://maps.google.com/?q=${osc.lat},${osc.lon}`
+                      : `https://maps.google.com/?q=${encodeURIComponent(`${osc.district} One Stop Centre ${osc.state} India`)}`
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 mt-2 text-xs text-orange-500 hover:text-orange-700 transition-colors"

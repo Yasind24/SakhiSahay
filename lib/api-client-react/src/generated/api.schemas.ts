@@ -17,6 +17,10 @@ export interface Osc {
   administratorName: string;
   administratorEmail?: string;
   address?: string;
+  /** @nullable */
+  lat: number | null;
+  /** @nullable */
+  lon: number | null;
 }
 
 export interface OscListResponse {
@@ -51,6 +55,7 @@ export interface OscStats {
   totalOscs: number;
   totalStates: number;
   totalDistricts: number;
+  geocodedDistricts: number;
   topStates: StateSummary[];
 }
 

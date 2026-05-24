@@ -4,9 +4,9 @@ import { ArrowLeft, Heart, Phone, MapPin, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { getMapOscs, getStates, type MapResponse, type StatesResponse } from "@/lib/local-api";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
-const API_BASE = `${BASE}/api`;
 
 // Fix broken marker icons in bundler environments
 const markerIcon = L.icon({
@@ -30,10 +30,6 @@ interface OscMapEntry {
   lon: number;
 }
 
-interface StatesResponse {
-  states: Array<{ state: string; count: number }>;
-}
-
 export default function MapView() {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
@@ -42,13 +38,12 @@ export default function MapView() {
 
   const { data: statesData } = useQuery<StatesResponse>({
     queryKey: ["states"],
-    queryFn: () => fetch(`${API_BASE}/oscs/states`).then(r => r.json()),
+    queryFn: getStates,
   });
 
-  const { data, isLoading } = useQuery<{ data: OscMapEntry[]; total: number }>({
+  const { data, isLoading } = useQuery<MapResponse>({
     queryKey: ["oscs-map", selectedState],
-    queryFn: () =>
-      fetch(`${API_BASE}/oscs/map${selectedState ? `?state=${encodeURIComponent(selectedState)}` : ""}`).then(r => r.json()),
+    queryFn: () => getMapOscs(selectedState),
   });
 
   const oscs = data?.data ?? [];
@@ -173,8 +168,8 @@ export default function MapView() {
                 <MapPin className="w-10 h-10 mx-auto mb-3 text-orange-300" />
                 <p className="font-semibold text-orange-800 mb-1">Geocoding in progress</p>
                 <p className="text-sm text-orange-500 leading-relaxed">
-                  Location coordinates for all 679 districts are being generated using OpenStreetMap.
-                  This takes ~12 minutes. Please check back soon.
+                  Location coordinates are being prepared for the centre directory.
+                  Please check back soon.
                 </p>
               </div>
             </div>

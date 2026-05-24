@@ -2,30 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { Search, MapPin, Phone, ArrowLeft, Heart, X, Filter } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { getDistricts, getOscs, getStates, type OscsResponse, type StatesResponse } from "@/lib/local-api";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
-const API_BASE = `${BASE}/api`;
-
-interface OscEntry {
-  id: number;
-  state: string;
-  district: string;
-  name: string;
-  email: string;
-  address: string;
-}
-
-interface OscsResponse {
-  data: OscEntry[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-interface StatesResponse {
-  states: Array<{ state: string; count: number }>;
-}
 
 export default function Centres() {
   const [location] = useLocation();
@@ -56,17 +35,17 @@ export default function Centres() {
 
   const { data, isLoading } = useQuery<OscsResponse>({
     queryKey: ["oscs", queryParams.toString()],
-    queryFn: () => fetch(`${API_BASE}/oscs?${queryParams}`).then(r => r.json()),
+    queryFn: () => getOscs({ q: debouncedSearch, state, district, page, limit: 24 }),
   });
 
   const { data: statesData } = useQuery<StatesResponse>({
     queryKey: ["states"],
-    queryFn: () => fetch(`${API_BASE}/oscs/states`).then(r => r.json()),
+    queryFn: getStates,
   });
 
   const { data: districtsData } = useQuery({
     queryKey: ["districts", state],
-    queryFn: () => fetch(`${API_BASE}/oscs/districts?state=${encodeURIComponent(state)}`).then(r => r.json()),
+    queryFn: () => getDistricts(state),
     enabled: !!state,
   });
 

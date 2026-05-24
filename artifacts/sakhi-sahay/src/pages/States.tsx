@@ -1,18 +1,14 @@
 import { Link } from "wouter";
 import { ArrowLeft, MapPin, Phone, Heart } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { getStates, type StatesResponse } from "@/lib/local-api";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
-const API_BASE = `${BASE}/api`;
-
-interface StatesResponse {
-  states: Array<{ state: string; count: number }>;
-}
 
 export default function States() {
   const { data, isLoading } = useQuery<StatesResponse>({
     queryKey: ["states"],
-    queryFn: () => fetch(`${API_BASE}/oscs/states`).then(r => r.json()),
+    queryFn: getStates,
   });
 
   return (

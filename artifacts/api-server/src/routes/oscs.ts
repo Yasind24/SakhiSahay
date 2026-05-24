@@ -34,7 +34,10 @@ function getCoords(district: string, state: string) {
   return geoCache[key] ?? null;
 }
 
-function withCoords<T extends { district: string; state: string }>(osc: T) {
+function withCoords<T extends { district: string; state: string; lat?: number; lon?: number }>(osc: T) {
+  if (typeof osc.lat === "number" && typeof osc.lon === "number") {
+    return { ...osc, lat: osc.lat, lon: osc.lon };
+  }
   const coords = getCoords(osc.district, osc.state);
   return { ...osc, lat: coords?.lat ?? null, lon: coords?.lon ?? null };
 }
@@ -88,7 +91,11 @@ router.get("/oscs/stats", (_req, res) => {
     .slice(0, 10)
     .map(([state, count]) => ({ state, count }));
 
-  const geocodedCount = Object.values(geoCache).filter(Boolean).length;
+  const geocodedCount = ALL_OSCS.filter(
+    (osc) =>
+      (typeof osc.lat === "number" && typeof osc.lon === "number") ||
+      Boolean(getCoords(osc.district, osc.state)),
+  ).length;
 
   res.json({
     totalOscs: total,
