@@ -282,9 +282,9 @@ export default function Home() {
           <div className="grid lg:grid-cols-[0.85fr_1.15fr]">
             <div className="bg-gradient-to-br from-rose-700 to-rose-600 text-white p-6 sm:p-8">
               <BadgeInfo className="w-8 h-8 text-white/80 mb-4" />
-              <h2 className="text-2xl sm:text-3xl font-bold mb-3">Not sure what support fits?</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3">Guided Help Finder</h2>
               <p className="text-rose-50 leading-relaxed">
-                Answer a few private, no-login prompts and get a grounded next step based on OSC services and official helplines.
+                Find relevant One Stop Centre services, emergency contacts, and official guidelines tailored to your needs.
               </p>
             </div>
             <div className="p-6 sm:p-8">
