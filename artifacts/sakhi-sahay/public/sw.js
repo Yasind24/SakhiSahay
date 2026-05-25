@@ -6,7 +6,7 @@ const APP_SHELL = [
   "/icon-192.png?v=3",
   "/favicon-512.png?v=3",
   "/favicon.svg?v=3",
-  "/social-preview.jpg?v=3",
+  "/social-preview-v3.jpg",
 ];
 
 self.addEventListener("install", (event) => {
