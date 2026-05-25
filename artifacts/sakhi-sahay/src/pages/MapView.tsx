@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { getMapOscs, getStates, type MapResponse, type StatesResponse } from "@/lib/local-api";
+import { googleMapsDirectionsUrl } from "@/lib/geo";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -107,17 +108,17 @@ export default function MapView() {
   }, [oscs, selectedState]);
 
   return (
-    <div className="min-h-screen bg-[hsl(36,100%,97%)] flex flex-col">
+    <div className="min-h-screen bg-[hsl(350,100%,98%)] flex flex-col">
       {/* Navbar */}
-      <nav className="sticky top-0 z-[1000] bg-white/95 backdrop-blur border-b border-orange-100 shadow-sm">
+      <nav className="sticky top-0 z-[1000] bg-white/95 backdrop-blur border-b border-rose-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
-          <Link href={`${BASE}/`} className="flex items-center gap-2 font-bold text-orange-700 text-lg">
+          <Link href={`${BASE}/`} className="flex items-center gap-2 font-bold text-rose-700 text-lg">
             <Heart className="w-5 h-5 text-rose-600 fill-rose-600" />
             SakhiSahay
           </Link>
           <div className="flex items-center gap-4">
-            <Link href={`${BASE}/centres`} className="text-sm font-medium text-orange-800 hover:text-orange-600 transition-colors hidden sm:block">Find Centres</Link>
-            <Link href={`${BASE}/states`} className="text-sm font-medium text-orange-800 hover:text-orange-600 transition-colors hidden sm:block">By State</Link>
+            <Link href={`${BASE}/centres`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">Find Centres</Link>
+            <Link href={`${BASE}/states`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">By State</Link>
             <a href="tel:181" className="flex items-center gap-1.5 bg-rose-600 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-rose-700 transition-colors shadow-sm">
               <Phone className="w-3.5 h-3.5" />
               181
@@ -127,22 +128,22 @@ export default function MapView() {
       </nav>
 
       {/* Controls bar */}
-      <div className="bg-white border-b border-orange-100 px-4 py-3 flex items-center gap-4 flex-wrap z-10">
-        <Link href={`${BASE}/`} className="inline-flex items-center gap-1.5 text-orange-600 hover:text-orange-800 text-sm transition-colors">
+      <div className="bg-white border-b border-rose-100 px-4 py-3 flex items-center gap-4 flex-wrap z-10">
+        <Link href={`${BASE}/`} className="inline-flex items-center gap-1.5 text-rose-600 hover:text-rose-800 text-sm transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Back
         </Link>
         <div className="flex items-center gap-2 flex-1">
-          <MapPin className="w-4 h-4 text-orange-500 shrink-0" />
-          <span className="text-sm font-semibold text-orange-900">OSC Map</span>
-          <span className="text-xs text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full">
+          <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
+          <span className="text-sm font-semibold text-rose-900">OSC Map</span>
+          <span className="text-xs text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full">
             {isLoading ? "loading…" : oscs.length === 0 ? "coordinates loading — check back soon" : `${oscs.length} centres mapped`}
           </span>
         </div>
         <select
           value={selectedState}
           onChange={e => { setSelectedState(e.target.value); setSelected(null); }}
-          className="border border-orange-200 rounded-xl px-3 py-1.5 text-sm text-orange-900 focus:outline-none focus:border-orange-500 bg-white cursor-pointer"
+          className="border border-rose-200 rounded-xl px-3 py-1.5 text-sm text-rose-900 focus:outline-none focus:border-rose-500 bg-white cursor-pointer"
         >
           <option value="">All States</option>
           {statesData?.states.map(s => (
@@ -155,8 +156,8 @@ export default function MapView() {
       <div className="flex flex-1" style={{ height: "calc(100vh - 113px)" }}>
         <div className="relative flex-1">
           {isLoading && (
-            <div className="absolute inset-0 z-10 bg-orange-50/80 flex items-center justify-center pointer-events-none">
-              <div className="flex items-center gap-2 text-orange-600 bg-white/90 rounded-xl px-4 py-2 shadow">
+            <div className="absolute inset-0 z-10 bg-rose-50/80 flex items-center justify-center pointer-events-none">
+              <div className="flex items-center gap-2 text-rose-600 bg-white/90 rounded-xl px-4 py-2 shadow">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span className="text-sm font-medium">Loading map…</span>
               </div>
@@ -165,9 +166,9 @@ export default function MapView() {
           {!isLoading && oscs.length === 0 && (
             <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
               <div className="text-center bg-white/90 rounded-2xl shadow-lg p-8 max-w-sm mx-4">
-                <MapPin className="w-10 h-10 mx-auto mb-3 text-orange-300" />
-                <p className="font-semibold text-orange-800 mb-1">Geocoding in progress</p>
-                <p className="text-sm text-orange-500 leading-relaxed">
+                <MapPin className="w-10 h-10 mx-auto mb-3 text-rose-300" />
+                <p className="font-semibold text-rose-800 mb-1">Geocoding in progress</p>
+                <p className="text-sm text-rose-500 leading-relaxed">
                   Location coordinates are being prepared for the centre directory.
                   Please check back soon.
                 </p>
@@ -179,39 +180,47 @@ export default function MapView() {
 
         {/* Selected centre panel */}
         {selected && (
-          <div className="w-72 bg-white border-l border-orange-100 overflow-y-auto shrink-0 z-10">
-            <div className="p-4 bg-gradient-to-br from-orange-500 to-amber-400 text-white">
+          <div className="w-72 bg-white border-l border-rose-100 overflow-y-auto shrink-0 z-10">
+            <div className="p-4 bg-gradient-to-br from-rose-500 to-red-400 text-white">
               <button onClick={() => setSelected(null)} className="text-white/70 hover:text-white text-xs mb-2 block">← Close</button>
               <span className="text-xs font-semibold bg-white/20 px-2 py-0.5 rounded-full">{selected.state}</span>
               <h2 className="text-lg font-bold mt-2">{selected.district}</h2>
-              <p className="text-orange-100 text-xs">One Stop Centre (Sakhi Kendra)</p>
+              <p className="text-rose-100 text-xs">One Stop Centre (Sakhi Kendra)</p>
             </div>
             <div className="p-4 space-y-4">
               {selected.name && (
                 <div>
-                  <div className="text-xs font-semibold text-orange-400 uppercase tracking-wide mb-1">Administrator</div>
-                  <div className="text-sm text-orange-900 font-medium">{selected.name}</div>
+                  <div className="text-xs font-semibold text-rose-400 uppercase tracking-wide mb-1">Administrator</div>
+                  <div className="text-sm text-rose-900 font-medium">{selected.name}</div>
                 </div>
               )}
               {selected.address && (
                 <div>
-                  <div className="text-xs font-semibold text-orange-400 uppercase tracking-wide mb-1">Address</div>
-                  <div className="text-sm text-orange-700 leading-relaxed">{selected.address}</div>
+                  <div className="text-xs font-semibold text-rose-400 uppercase tracking-wide mb-1">Address</div>
+                  <div className="text-sm text-rose-700 leading-relaxed">{selected.address}</div>
                 </div>
               )}
               {selected.email && (
                 <div>
-                  <div className="text-xs font-semibold text-orange-400 uppercase tracking-wide mb-1">Email</div>
-                  <a href={`mailto:${selected.email}`} className="text-sm text-orange-600 hover:text-orange-800 break-all">{selected.email}</a>
+                  <div className="text-xs font-semibold text-rose-400 uppercase tracking-wide mb-1">Email</div>
+                  <a href={`mailto:${selected.email}`} className="text-sm text-rose-600 hover:text-rose-800 break-all">{selected.email}</a>
                 </div>
               )}
               <div className="pt-2 space-y-2">
                 <Link
                   href={`${BASE}/centres/${selected.id}`}
-                  className="block text-center bg-orange-600 text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-orange-700 transition-colors"
+                  className="block text-center bg-rose-600 text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-rose-700 transition-colors"
                 >
                   View Full Details
                 </Link>
+                <a
+                  href={googleMapsDirectionsUrl({ lat: selected.lat, lon: selected.lon })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-center bg-white border border-rose-200 text-rose-700 text-sm font-semibold py-2.5 rounded-xl hover:bg-rose-50 transition-colors"
+                >
+                  Open Google Maps Directions
+                </a>
                 <a
                   href="tel:181"
                   className="block text-center bg-rose-50 border border-rose-200 rounded-xl py-2.5 hover:bg-rose-100 transition-colors"

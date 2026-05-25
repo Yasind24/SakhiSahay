@@ -7,6 +7,7 @@ import Centres from "@/pages/Centres";
 import CentreDetail from "@/pages/CentreDetail";
 import States from "@/pages/States";
 import MapView from "@/pages/MapView";
+import HelpFinder from "@/pages/HelpFinder";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/centres/:id" component={CentreDetail} />
       <Route path="/states" component={States} />
       <Route path="/map" component={MapView} />
+      <Route path="/help-finder" component={HelpFinder} />
       <Route component={NotFound} />
     </Switch>
   );

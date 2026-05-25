@@ -1,29 +1,90 @@
 import { Link } from "wouter";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Phone, MapPin, Search, ChevronRight, Heart, Shield, Users } from "lucide-react";
-import { getOscStats, type OscStatsResponse } from "@/lib/local-api";
+import { Phone, MapPin, Search, Heart, Shield, Users, Navigation, Loader2, ExternalLink, BadgeInfo } from "lucide-react";
+import { getMapOscs, getOscStats, type MapResponse, type OscStatsResponse } from "@/lib/local-api";
+import { distanceInKm, googleMapsDirectionsUrl, type Coordinates } from "@/lib/geo";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+type FinderState = "idle" | "locating" | "found" | "blocked" | "unavailable" | "error";
+
 export default function Home() {
+  const [finderState, setFinderState] = useState<FinderState>("idle");
+  const [nearest, setNearest] = useState<(MapResponse["data"][number] & { distanceKm: number }) | null>(null);
+  const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
+
   const { data: stats } = useQuery<OscStatsResponse>({
     queryKey: ["osc-stats"],
     queryFn: getOscStats,
   });
 
+  const { data: mapData, isLoading: isLoadingMapData } = useQuery<MapResponse>({
+    queryKey: ["oscs-map", "nearest-home"],
+    queryFn: () => getMapOscs(),
+  });
+
+  const mappedCentreCount = mapData?.data.length ?? 0;
+
+  const finderMessage = useMemo(() => {
+    if (finderState === "blocked") return "Location permission was blocked. You can still browse centres by state or use the map.";
+    if (finderState === "unavailable") return "Your browser could not share a location right now. Try searching by district instead.";
+    if (finderState === "error") return "Something went wrong while finding the nearest mapped centre. Please try again.";
+    if (finderState === "found" && nearest) return `${nearest.district}, ${nearest.state} is the closest mapped OSC we found.`;
+    return "Share your location privately in the browser to route to the nearest mapped One Stop Centre.";
+  }, [finderState, nearest]);
+
+  const findNearestCentre = () => {
+    if (!navigator.geolocation) {
+      setFinderState("unavailable");
+      return;
+    }
+
+    if (!mapData?.data.length) {
+      setFinderState("error");
+      return;
+    }
+
+    setFinderState("locating");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const origin = {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        };
+
+        const closest = mapData.data
+          .map((osc) => ({ ...osc, distanceKm: distanceInKm(origin, { lat: osc.lat, lon: osc.lon }) }))
+          .sort((a, b) => a.distanceKm - b.distanceKm)[0];
+
+        setUserLocation(origin);
+        setNearest(closest);
+        setFinderState("found");
+
+        const directionsUrl = googleMapsDirectionsUrl({ lat: closest.lat, lon: closest.lon }, origin);
+        window.open(directionsUrl, "_blank", "noopener,noreferrer");
+      },
+      (error) => {
+        setFinderState(error.code === error.PERMISSION_DENIED ? "blocked" : "unavailable");
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 5 * 60 * 1000 },
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-[hsl(36,100%,97%)]">
+    <div className="min-h-screen bg-[hsl(350,100%,98%)]">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-orange-100 shadow-sm">
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-rose-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
-          <Link href={`${BASE}/`} className="flex items-center gap-2 font-bold text-orange-700 text-lg">
+          <Link href={`${BASE}/`} className="flex items-center gap-2 font-bold text-rose-700 text-lg">
             <Heart className="w-5 h-5 text-rose-600 fill-rose-600" />
             SakhiSahay
           </Link>
           <div className="flex items-center gap-4">
-            <Link href={`${BASE}/centres`} className="text-sm font-medium text-orange-800 hover:text-orange-600 transition-colors hidden sm:block">Find Centres</Link>
-            <Link href={`${BASE}/states`} className="text-sm font-medium text-orange-800 hover:text-orange-600 transition-colors hidden sm:block">By State</Link>
-            <Link href={`${BASE}/map`} className="text-sm font-medium text-orange-800 hover:text-orange-600 transition-colors hidden sm:block">Map</Link>
+            <Link href={`${BASE}/centres`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">Find Centres</Link>
+            <Link href={`${BASE}/help-finder`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">Help Finder</Link>
+            <Link href={`${BASE}/states`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">By State</Link>
+            <Link href={`${BASE}/map`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">Map</Link>
             <a href="tel:181" className="flex items-center gap-1.5 bg-rose-600 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-rose-700 transition-colors shadow-sm">
               <Phone className="w-3.5 h-3.5" />
               181
@@ -33,10 +94,11 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-rose-600 via-rose-500 to-red-500 text-white">
         <div className="absolute inset-0 opacity-10" style={{backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "60px 60px"}} />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="max-w-3xl">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-12 items-center">
+          <div>
             {/* 181 badge */}
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur rounded-full px-4 py-2 mb-6">
               <Phone className="w-4 h-4" />
@@ -46,30 +108,145 @@ export default function Home() {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-4">
               Sakhi Kendras —<br />
-              <span className="text-amber-200">Safe spaces near you</span>
+              <span className="text-red-200">Safe spaces near you</span>
             </h1>
-            <p className="text-lg sm:text-xl text-orange-100 mb-8 max-w-xl">
+            <p className="text-lg sm:text-xl text-rose-100 mb-8 max-w-xl">
               Find One Stop Centres (OSCs) across India that provide free medical, legal, police, shelter and counselling support to women in distress.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link href={`${BASE}/centres`} className="inline-flex items-center justify-center gap-2 bg-white text-orange-700 font-bold px-6 py-3.5 rounded-xl hover:bg-orange-50 transition-colors shadow-md text-base">
-                <Search className="w-4 h-4" />
+              <button
+                onClick={findNearestCentre}
+                disabled={finderState === "locating" || isLoadingMapData || mappedCentreCount === 0}
+                className="inline-flex items-center justify-center gap-2 bg-white text-rose-700 font-bold px-6 py-3.5 rounded-xl hover:bg-rose-50 transition-colors shadow-md text-base disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {finderState === "locating" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4" />}
                 Find a Centre Near You
-              </Link>
+              </button>
               <Link href={`${BASE}/states`} className="inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur text-white font-semibold px-6 py-3.5 rounded-xl hover:bg-white/30 transition-colors border border-white/30 text-base">
                 <MapPin className="w-4 h-4" />
                 Browse by State
               </Link>
+              <Link href={`${BASE}/help-finder`} className="inline-flex items-center justify-center gap-2 bg-rose-950/25 backdrop-blur text-white font-semibold px-6 py-3.5 rounded-xl hover:bg-rose-950/35 transition-colors border border-white/25 text-base">
+                <BadgeInfo className="w-4 h-4" />
+                Guided Help
+              </Link>
             </div>
+          </div>
+
+          <div className="bg-white text-rose-950 rounded-2xl shadow-2xl border border-white/60 overflow-hidden">
+            <div className="p-5 sm:p-6 bg-[hsl(350,100%,99%)] border-b border-rose-100">
+              <div className="flex items-start gap-3">
+                <div className="w-11 h-11 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
+                  <Navigation className="w-5 h-5 text-rose-600" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-xl text-rose-950">Nearest real OSC routing</h2>
+                  <p className="text-sm text-rose-700 mt-1 leading-relaxed">{finderMessage}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-5 sm:p-6 space-y-4">
+              {nearest ? (
+                <div className="rounded-xl border border-rose-100 bg-rose-50/70 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-semibold text-rose-500 uppercase">Closest mapped centre</div>
+                      <div className="font-bold text-rose-950 mt-1">{nearest.district}, {nearest.state}</div>
+                      <div className="text-sm text-rose-700 mt-1">{nearest.distanceKm.toFixed(1)} km away approx.</div>
+                    </div>
+                    <MapPin className="w-5 h-5 text-rose-500 shrink-0" />
+                  </div>
+                  {nearest.address && <p className="text-xs text-rose-700/80 mt-3 line-clamp-2">{nearest.address}</p>}
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="rounded-xl bg-rose-50 border border-rose-100 p-3">
+                    <div className="font-black text-rose-800">{mappedCentreCount || "—"}</div>
+                    <div className="text-[11px] text-rose-500">mapped</div>
+                  </div>
+                  <div className="rounded-xl bg-rose-50 border border-rose-100 p-3">
+                    <div className="font-black text-rose-700">181</div>
+                    <div className="text-[11px] text-rose-500">helpline</div>
+                  </div>
+                  <div className="rounded-xl bg-red-50 border border-red-100 p-3">
+                    <div className="font-black text-red-700">Maps</div>
+                    <div className="text-[11px] text-red-600">routing</div>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                <button
+                  onClick={findNearestCentre}
+                  disabled={finderState === "locating" || isLoadingMapData || mappedCentreCount === 0}
+                  className="inline-flex items-center justify-center gap-2 bg-rose-600 text-white font-bold px-4 py-3 rounded-xl hover:bg-rose-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {finderState === "locating" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4" />}
+                  Use my location
+                </button>
+                {nearest ? (
+                  <a
+                    href={googleMapsDirectionsUrl({ lat: nearest.lat, lon: nearest.lon }, userLocation ?? undefined)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 bg-white border border-rose-200 text-rose-700 font-bold px-4 py-3 rounded-xl hover:bg-rose-50 transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Open directions
+                  </a>
+                ) : (
+                  <Link
+                    href={`${BASE}/centres`}
+                    className="inline-flex items-center justify-center gap-2 bg-white border border-rose-200 text-rose-700 font-bold px-4 py-3 rounded-xl hover:bg-rose-50 transition-colors"
+                  >
+                    <Search className="w-4 h-4" />
+                    Search manually
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
           </div>
         </div>
 
         {/* Wave */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 60L1440 60L1440 20C1200 60 960 0 720 20C480 40 240 0 0 20L0 60Z" fill="hsl(36,100%,97%)" />
+            <path d="M0 60L1440 60L1440 20C1200 60 960 0 720 20C480 40 240 0 0 20L0 60Z" fill="hsl(350,100%,98%)" />
           </svg>
+        </div>
+      </section>
+
+      {/* Guided Help Finder CTA */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+        <div className="bg-white rounded-2xl border border-rose-100 shadow-sm overflow-hidden">
+          <div className="grid lg:grid-cols-[0.85fr_1.15fr]">
+            <div className="bg-gradient-to-br from-rose-700 to-rose-600 text-white p-6 sm:p-8">
+              <BadgeInfo className="w-8 h-8 text-white/80 mb-4" />
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3">Not sure what support fits?</h2>
+              <p className="text-rose-50 leading-relaxed">
+                Answer a few private, no-login prompts and get a grounded next step based on OSC services and official helplines.
+              </p>
+            </div>
+            <div className="p-6 sm:p-8">
+              <div className="grid sm:grid-cols-3 gap-3 mb-5">
+                {["Medical, police, legal", "Counselling or shelter", "Child or cyber support"].map((item) => (
+                  <div key={item} className="rounded-xl bg-rose-50 border border-rose-100 px-4 py-3 text-sm font-semibold text-rose-800">
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <Link
+                href={`${BASE}/help-finder`}
+                className="inline-flex items-center justify-center gap-2 bg-rose-600 text-white font-bold px-5 py-3 rounded-xl hover:bg-rose-700 transition-colors"
+              >
+                <BadgeInfo className="w-4 h-4" />
+                Open Guided Help Finder
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -82,10 +259,10 @@ export default function Home() {
             { value: stats?.totalDistricts.toLocaleString() ?? "—", label: "Districts", icon: Users },
             { value: "181", label: "Free Helpline", icon: Phone },
           ].map((stat) => (
-            <div key={stat.label} className="bg-white rounded-2xl p-5 text-center border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
-              <stat.icon className="w-6 h-6 text-orange-500 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-orange-800">{stat.value}</div>
-              <div className="text-sm text-orange-600 mt-1">{stat.label}</div>
+            <div key={stat.label} className="bg-white rounded-2xl p-5 text-center border border-rose-100 shadow-sm hover:shadow-md transition-shadow">
+              <stat.icon className="w-6 h-6 text-rose-500 mx-auto mb-2" />
+              <div className="text-3xl font-bold text-rose-800">{stat.value}</div>
+              <div className="text-sm text-rose-600 mt-1">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -93,7 +270,7 @@ export default function Home() {
 
       {/* What is a Sakhi Kendra */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
-        <h2 className="text-2xl sm:text-3xl font-bold text-orange-900 mb-8 text-center">What is a Sakhi Kendra?</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-rose-900 mb-8 text-center">What is a Sakhi Kendra?</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
             { icon: "🏥", title: "Medical Help", desc: "Emergency medical care and forensic examination, all free of cost." },
@@ -103,10 +280,10 @@ export default function Home() {
             { icon: "🚔", title: "Police Assistance", desc: "Help with filing complaints and police liaison." },
             { icon: "📋", title: "Case Management", desc: "Referral to other government welfare schemes and follow-up." },
           ].map((item) => (
-            <div key={item.title} className="bg-white rounded-2xl p-6 border border-orange-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+            <div key={item.title} className="bg-white rounded-2xl p-6 border border-rose-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
               <div className="text-3xl mb-3">{item.icon}</div>
-              <h3 className="font-bold text-orange-900 mb-1">{item.title}</h3>
-              <p className="text-sm text-orange-700/80 leading-relaxed">{item.desc}</p>
+              <h3 className="font-bold text-rose-900 mb-1">{item.title}</h3>
+              <p className="text-sm text-rose-700/80 leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -126,9 +303,9 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-orange-900 text-orange-200 py-8 text-center text-sm px-4">
+      <footer className="bg-rose-900 text-rose-200 py-8 text-center text-sm px-4">
         <p className="mb-1">SakhiSahay — Helping women find One Stop Centres across India</p>
-        <p className="text-orange-400 text-xs">Data sourced from Ministry of Women & Child Development, Government of India. Not an official government website.</p>
+        <p className="text-rose-400 text-xs">Data sourced from Ministry of Women & Child Development, Government of India. Not an official government website.</p>
         <div className="flex justify-center gap-6 mt-4">
           <Link href={`${BASE}/centres`} className="hover:text-white transition-colors">Find Centres</Link>
           <Link href={`${BASE}/states`} className="hover:text-white transition-colors">By State</Link>

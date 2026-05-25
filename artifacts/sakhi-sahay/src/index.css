@@ -66,7 +66,7 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* LIGHT MODE — Saffron-Rose-Cream palette */
+/* LIGHT MODE - Rose-red care palette */
 :root {
   --button-outline: rgba(0,0,0,.10);
   --badge-outline: rgba(0,0,0,.05);
@@ -74,56 +74,56 @@
   --elevate-1: rgba(0,0,0,.03);
   --elevate-2: rgba(0,0,0,.08);
 
-  /* Warm cream background */
-  --background: 36 100% 97%;
-  --foreground: 20 60% 10%;
+  /* Soft blush background */
+  --background: 350 100% 98%;
+  --foreground: 345 55% 12%;
 
-  --border: 30 50% 85%;
-  --input: 30 50% 85%;
-  --ring: 25 100% 50%;
+  --border: 345 45% 88%;
+  --input: 345 45% 88%;
+  --ring: 345 85% 45%;
 
   /* Card: warm white */
-  --card: 36 100% 98%;
-  --card-foreground: 20 60% 10%;
-  --card-border: 30 50% 88%;
+  --card: 350 100% 99%;
+  --card-foreground: 345 55% 12%;
+  --card-border: 345 45% 90%;
 
-  /* Sidebar: saffron-tinted */
-  --sidebar: 30 60% 95%;
-  --sidebar-foreground: 20 60% 15%;
-  --sidebar-border: 30 40% 82%;
-  --sidebar-primary: 25 100% 45%;
+  /* Sidebar: blush-tinted */
+  --sidebar: 350 75% 96%;
+  --sidebar-foreground: 345 55% 15%;
+  --sidebar-border: 345 35% 84%;
+  --sidebar-primary: 345 78% 43%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 30 80% 90%;
-  --sidebar-accent-foreground: 20 60% 15%;
-  --sidebar-ring: 25 100% 50%;
+  --sidebar-accent: 350 78% 92%;
+  --sidebar-accent-foreground: 345 55% 15%;
+  --sidebar-ring: 345 85% 45%;
 
-  --popover: 36 100% 98%;
-  --popover-foreground: 20 60% 10%;
-  --popover-border: 30 50% 85%;
+  --popover: 350 100% 99%;
+  --popover-foreground: 345 55% 12%;
+  --popover-border: 345 45% 88%;
 
-  /* Primary: saffron orange */
-  --primary: 25 100% 45%;
+  /* Primary: heart rose */
+  --primary: 345 78% 43%;
   --primary-foreground: 0 0% 100%;
 
-  /* Secondary: warm rose */
-  --secondary: 345 60% 35%;
+  /* Secondary: deep red */
+  --secondary: 355 68% 36%;
   --secondary-foreground: 0 0% 100%;
 
-  /* Muted: warm beige */
-  --muted: 36 40% 92%;
-  --muted-foreground: 20 30% 40%;
+  /* Muted: pale blush */
+  --muted: 350 42% 94%;
+  --muted-foreground: 345 28% 40%;
 
-  /* Accent: golden amber */
-  --accent: 40 100% 50%;
-  --accent-foreground: 20 60% 10%;
+  /* Accent: clear red */
+  --accent: 0 72% 51%;
+  --accent-foreground: 0 0% 100%;
 
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
 
-  --chart-1: 25 100% 45%;
+  --chart-1: 345 78% 43%;
   --chart-2: 345 60% 40%;
-  --chart-3: 40 100% 50%;
-  --chart-4: 15 80% 50%;
+  --chart-3: 0 72% 51%;
+  --chart-4: 330 65% 46%;
   --chart-5: 200 60% 45%;
 
   --app-font-sans: 'Inter', sans-serif;
@@ -131,14 +131,14 @@
   --app-font-mono: Menlo, monospace;
   --radius: .5rem;
 
-  --shadow-2xs: 0px 1px 2px 0px hsla(20,60%,10%,0.06);
-  --shadow-xs: 0px 2px 4px 0px hsla(20,60%,10%,0.08);
-  --shadow-sm: 0px 2px 4px 0px hsla(20,60%,10%,0.08), 0px 1px 2px -1px hsla(20,60%,10%,0.06);
-  --shadow: 0px 4px 8px 0px hsla(20,60%,10%,0.10), 0px 2px 4px -2px hsla(20,60%,10%,0.08);
-  --shadow-md: 0px 6px 12px 0px hsla(20,60%,10%,0.12), 0px 3px 6px -3px hsla(20,60%,10%,0.08);
-  --shadow-lg: 0px 10px 20px 0px hsla(20,60%,10%,0.14), 0px 4px 8px -4px hsla(20,60%,10%,0.10);
-  --shadow-xl: 0px 16px 32px 0px hsla(20,60%,10%,0.16), 0px 6px 12px -6px hsla(20,60%,10%,0.10);
-  --shadow-2xl: 0px 24px 48px 0px hsla(20,60%,10%,0.20);
+  --shadow-2xs: 0px 1px 2px 0px hsla(345,55%,12%,0.06);
+  --shadow-xs: 0px 2px 4px 0px hsla(345,55%,12%,0.08);
+  --shadow-sm: 0px 2px 4px 0px hsla(345,55%,12%,0.08), 0px 1px 2px -1px hsla(345,55%,12%,0.06);
+  --shadow: 0px 4px 8px 0px hsla(345,55%,12%,0.10), 0px 2px 4px -2px hsla(345,55%,12%,0.08);
+  --shadow-md: 0px 6px 12px 0px hsla(345,55%,12%,0.12), 0px 3px 6px -3px hsla(345,55%,12%,0.08);
+  --shadow-lg: 0px 10px 20px 0px hsla(345,55%,12%,0.14), 0px 4px 8px -4px hsla(345,55%,12%,0.10);
+  --shadow-xl: 0px 16px 32px 0px hsla(345,55%,12%,0.16), 0px 6px 12px -6px hsla(345,55%,12%,0.10);
+  --shadow-2xl: 0px 24px 48px 0px hsla(345,55%,12%,0.20);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
@@ -241,6 +241,6 @@
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: hsl(36 100% 97%); }
-::-webkit-scrollbar-thumb { background: hsl(25 80% 70%); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: hsl(25 100% 45%); }
+::-webkit-scrollbar-track { background: hsl(350 100% 98%); }
+::-webkit-scrollbar-thumb { background: hsl(345 70% 72%); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(345 78% 43%); }
