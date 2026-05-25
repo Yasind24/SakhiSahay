@@ -192,7 +192,7 @@ export default function Home() {
           </div>
 
           <div className="bg-white text-rose-950 rounded-2xl shadow-2xl border border-white/60 overflow-hidden">
-            <div className="p-5 sm:p-6 bg-[hsl(350,100%,99%)] border-b border-rose-100">
+            <div className="p-5 sm:p-6 bg-[hsl(350,100%,99%)]">
               <div className="flex items-start gap-3">
                 <div className="w-11 h-11 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
                   <Navigation className="w-5 h-5 text-rose-600" />
@@ -269,7 +269,7 @@ export default function Home() {
         </div>
 
         {/* Wave */}
-        <div className="absolute bottom-0 left-0 right-0">
+        <div className="pointer-events-none absolute -bottom-px left-0 right-0">
           <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 60L1440 60L1440 20C1200 60 960 0 720 20C480 40 240 0 0 20L0 60Z" fill="hsl(350,100%,98%)" />
           </svg>
