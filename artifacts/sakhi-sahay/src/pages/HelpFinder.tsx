@@ -17,7 +17,10 @@ import {
   Phone,
   Shield,
   Siren,
+  Loader2,
 } from "lucide-react";
+import { getMapOscs } from "@/lib/local-api";
+import { distanceInKm, googleMapsDirectionsUrl } from "@/lib/geo";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -210,6 +213,57 @@ export default function HelpFinder() {
   const recommendation = useMemo(() => getRecommendation(selectedNeed, urgency), [selectedNeed, urgency]);
   const primaryAction = recommendation.actions[0];
 
+  const [findingLocation, setFindingLocation] = useState(false);
+
+  const findNearestCentre = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (findingLocation) return;
+
+    if (!navigator.geolocation) {
+      alert("Location services are not supported by your browser. Redirecting to the centres directory.");
+      window.location.href = `${BASE}/centres`;
+      return;
+    }
+
+    setFindingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFindingLocation(false);
+        const origin = {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        };
+
+        const mapData = getMapOscs();
+        if (!mapData || !mapData.data.length) {
+          alert("Could not load center coordinates. Redirecting to the centres directory.");
+          window.location.href = `${BASE}/centres`;
+          return;
+        }
+
+        const closest = mapData.data
+          .map((osc) => ({ ...osc, distanceKm: distanceInKm(origin, { lat: osc.lat, lon: osc.lon }) }))
+          .sort((a, b) => a.distanceKm - b.distanceKm)[0];
+
+        const directionsUrl = googleMapsDirectionsUrl({ lat: closest.lat, lon: closest.lon }, origin);
+        window.open(directionsUrl, "_blank", "noopener,noreferrer");
+      },
+      (error) => {
+        setFindingLocation(false);
+        if (error.code === error.PERMISSION_DENIED) {
+          const proceed = confirm("Location access was denied. To find the nearest OSC, please enable location permissions. Would you like to browse centres manually instead?");
+          if (proceed) {
+            window.location.href = `${BASE}/centres`;
+          }
+        } else {
+          alert("Unable to retrieve your location. Redirecting to the centres directory.");
+          window.location.href = `${BASE}/centres`;
+        }
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 5 * 60 * 1000 },
+    );
+  };
+
   const showRecommendation = () => {
     window.setTimeout(() => {
       recommendationRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -346,12 +400,19 @@ export default function HelpFinder() {
                     <a
                       key={`${action.label}-${action.href}`}
                       href={action.href}
+                      onClick={action.label === "Find nearest OSC" ? findNearestCentre : undefined}
                       target={action.external ? "_blank" : undefined}
                       rel={action.external ? "noopener noreferrer" : undefined}
                       className={`inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold transition-colors ${actionClass(action.tone)}`}
                     >
-                      {action.href.startsWith("tel:") ? <Phone className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
-                      {action.label}
+                      {action.label === "Find nearest OSC" && findingLocation ? (
+                        <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                      ) : action.href.startsWith("tel:") ? (
+                        <Phone className="w-4 h-4 shrink-0" />
+                      ) : (
+                        <MapPin className="w-4 h-4 shrink-0" />
+                      )}
+                      {action.label === "Find nearest OSC" && findingLocation ? "Locating..." : action.label}
                     </a>
                   ))}
                 </div>
