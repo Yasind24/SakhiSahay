@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowLeft,
@@ -206,7 +206,25 @@ function actionClass(tone: Recommendation["actions"][number]["tone"]) {
 export default function HelpFinder() {
   const [selectedNeed, setSelectedNeed] = useState<NeedId>("unsure");
   const [urgency, setUrgency] = useState<Urgency>("soon");
+  const recommendationRef = useRef<HTMLDivElement>(null);
   const recommendation = useMemo(() => getRecommendation(selectedNeed, urgency), [selectedNeed, urgency]);
+  const primaryAction = recommendation.actions[0];
+
+  const showRecommendation = () => {
+    window.setTimeout(() => {
+      recommendationRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  };
+
+  const chooseUrgency = (value: Urgency) => {
+    setUrgency(value);
+    showRecommendation();
+  };
+
+  const chooseNeed = (value: NeedId) => {
+    setSelectedNeed(value);
+    showRecommendation();
+  };
 
   return (
     <div className="min-h-screen bg-[hsl(350,100%,98%)]">
@@ -255,7 +273,7 @@ export default function HelpFinder() {
                 ].map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => setUrgency(item.id as Urgency)}
+                    onClick={() => chooseUrgency(item.id as Urgency)}
                     className={`rounded-xl border px-3 py-3 text-sm font-semibold transition-colors ${
                       urgency === item.id
                         ? "bg-rose-600 text-white border-rose-700"
@@ -268,11 +286,27 @@ export default function HelpFinder() {
               </div>
             </div>
 
+            <a
+              href="#recommended-route"
+              onClick={(event) => {
+                event.preventDefault();
+                showRecommendation();
+              }}
+              className="mb-5 flex items-start justify-between gap-4 rounded-2xl border border-rose-200 bg-white p-4 text-left shadow-sm transition hover:bg-rose-50 lg:hidden"
+            >
+              <span>
+                <span className="block text-xs font-semibold uppercase text-rose-500">Recommended route</span>
+                <span className="mt-1 block font-bold text-rose-950">{recommendation.title}</span>
+                <span className="mt-1 block text-sm text-rose-700">Next action: {primaryAction.label}</span>
+              </span>
+              <BadgeInfo className="mt-1 h-5 w-5 shrink-0 text-rose-500" />
+            </a>
+
             <div className="grid sm:grid-cols-2 gap-3">
               {needs.map((need) => (
                 <button
                   key={need.id}
-                  onClick={() => setSelectedNeed(need.id)}
+                  onClick={() => chooseNeed(need.id)}
                   className={`text-left rounded-2xl border p-4 transition-all ${
                     selectedNeed === need.id
                       ? "bg-rose-600 text-white border-rose-700 shadow-md"
@@ -290,7 +324,11 @@ export default function HelpFinder() {
           </div>
 
           <aside className="lg:sticky lg:top-20 space-y-5">
-            <div className="bg-white rounded-2xl border border-rose-100 shadow-lg overflow-hidden">
+            <div
+              id="recommended-route"
+              ref={recommendationRef}
+              className="scroll-mt-20 bg-white rounded-2xl border border-rose-100 shadow-lg overflow-hidden"
+            >
               <div className="bg-gradient-to-br from-rose-600 to-red-500 text-white p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
