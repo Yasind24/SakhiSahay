@@ -22,6 +22,7 @@ export default function FloatingActions() {
     setCanShowInstall(!isStandaloneDisplay());
 
     const handleBeforeInstallPrompt = (event: Event) => {
+      // Keep Chrome's event so the floating install button can prompt on user intent.
       event.preventDefault();
       setInstallPrompt(event as BeforeInstallPromptEvent);
       setCanShowInstall(true);
