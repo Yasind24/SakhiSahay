@@ -1,5 +1,5 @@
-const CACHE_NAME = "sakhi-sahay-v1";
-const APP_SHELL = ["/", "/manifest.webmanifest", "/favicon.svg"];
+const CACHE_NAME = "sakhi-sahay-v2";
+const APP_SHELL = ["/", "/manifest.webmanifest", "/favicon.svg?v=2", "/opengraph.png?v=2"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
