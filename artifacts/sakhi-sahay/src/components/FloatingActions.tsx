@@ -66,7 +66,7 @@ export default function FloatingActions() {
           onClick={installApp}
           title="Install SakhiSahay"
           aria-label="Install SakhiSahay"
-          className="fixed bottom-5 left-4 z-[1200] inline-flex h-12 w-12 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700 shadow-lg transition hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 sm:left-5"
+          className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] left-4 z-[1200] inline-flex h-12 w-12 items-center justify-center rounded-full border border-rose-200 bg-white text-rose-700 shadow-lg transition hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 sm:left-5"
         >
           <Download className="h-5 w-5" />
         </button>
@@ -78,7 +78,7 @@ export default function FloatingActions() {
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           title="Scroll to top"
           aria-label="Scroll to top"
-          className="fixed bottom-5 right-4 z-[1200] inline-flex h-12 w-12 items-center justify-center rounded-full border border-rose-200 bg-rose-600 text-white shadow-lg transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 sm:right-5"
+          className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-4 z-[1200] inline-flex h-12 w-12 items-center justify-center rounded-full border border-rose-200 bg-rose-600 text-white shadow-lg transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 sm:right-5"
         >
           <ArrowUp className="h-5 w-5" />
         </button>

@@ -167,10 +167,22 @@
     background-color: #e11d48;
   }
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
+    background-color: #e11d48;
     min-height: 100vh;
     min-height: 100dvh;
     padding-bottom: env(safe-area-inset-bottom);
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    z-index: 1190;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: env(safe-area-inset-bottom);
+    background-color: #e11d48;
+    pointer-events: none;
   }
   #root {
     min-height: 100vh;
