@@ -114,22 +114,22 @@ export default function Home() {
               Find One Stop Centres (OSCs) across India that provide free medical, legal, police, shelter and counselling support to women in distress.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="grid gap-3 sm:grid-cols-3">
               <button
                 onClick={findNearestCentre}
                 disabled={finderState === "locating" || isLoadingMapData || mappedCentreCount === 0}
-                className="inline-flex items-center justify-center gap-2 bg-white text-rose-700 font-bold px-6 py-3.5 rounded-xl hover:bg-rose-50 transition-colors shadow-md text-base disabled:opacity-70 disabled:cursor-not-allowed"
+                className="inline-flex min-h-20 w-full items-center justify-center gap-3 bg-white text-rose-700 font-bold px-5 py-4 rounded-xl hover:bg-rose-50 transition-colors shadow-md text-base disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {finderState === "locating" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Navigation className="w-4 h-4" />}
-                Find a Centre Near You
+                {finderState === "locating" ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : <Navigation className="w-4 h-4 shrink-0" />}
+                <span className="text-center leading-tight">Find a Centre Near You</span>
               </button>
-              <Link href={`${BASE}/states`} className="inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur text-white font-semibold px-6 py-3.5 rounded-xl hover:bg-white/30 transition-colors border border-white/30 text-base">
-                <MapPin className="w-4 h-4" />
-                Browse by State
+              <Link href={`${BASE}/states`} className="inline-flex min-h-20 w-full items-center justify-center gap-3 bg-white/20 backdrop-blur text-white font-semibold px-5 py-4 rounded-xl hover:bg-white/30 transition-colors border border-white/30 text-base">
+                <MapPin className="w-4 h-4 shrink-0" />
+                <span className="text-center leading-tight">Browse by State</span>
               </Link>
-              <Link href={`${BASE}/help-finder`} className="inline-flex items-center justify-center gap-2 bg-rose-950/25 backdrop-blur text-white font-semibold px-6 py-3.5 rounded-xl hover:bg-rose-950/35 transition-colors border border-white/25 text-base">
-                <BadgeInfo className="w-4 h-4" />
-                Guided Help
+              <Link href={`${BASE}/help-finder`} className="inline-flex min-h-20 w-full items-center justify-center gap-3 bg-rose-950/25 backdrop-blur text-white font-semibold px-5 py-4 rounded-xl hover:bg-rose-950/35 transition-colors border border-white/25 text-base">
+                <BadgeInfo className="w-4 h-4 shrink-0" />
+                <span className="text-center leading-tight">Guided Help</span>
               </Link>
             </div>
           </div>

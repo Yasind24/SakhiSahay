@@ -1,0 +1,20 @@
+{
+  "name": "SakhiSahay",
+  "short_name": "SakhiSahay",
+  "description": "Find One Stop Centres, official helplines, and grounded support routes for women in distress.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff1f2",
+  "theme_color": "#e11d48",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "navigation", "utilities"]
+}
