@@ -144,8 +144,8 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <Link href={`${BASE}/centres`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">Find Centres</Link>
             <Link href={`${BASE}/help-finder`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">Help Finder</Link>
-            <Link href={`${BASE}/states`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">By State</Link>
-            <Link href={`${BASE}/map`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors">Map</Link>
+            <Link href={`${BASE}/centres?view=states`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">By State</Link>
+            <Link href={`${BASE}/centres?view=map`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors">Map</Link>
             <a href="tel:181" className="flex items-center gap-1.5 bg-rose-600 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-rose-700 transition-colors shadow-sm">
               <Phone className="w-3.5 h-3.5" />
               181
@@ -176,7 +176,7 @@ export default function Home() {
             </p>
 
             <div className="grid gap-3 grid-cols-2 sm:grid-cols-3">
-              <Link href={`${BASE}/map`} className="inline-flex min-h-14 sm:min-h-20 w-full items-center justify-center gap-2 sm:gap-3 bg-white text-rose-700 font-bold px-4 py-3 sm:py-4 rounded-xl hover:bg-rose-50 transition-colors shadow-md text-xs sm:text-base border border-white col-span-2 sm:col-span-1">
+              <Link href={`${BASE}/centres?view=map`} className="inline-flex min-h-14 sm:min-h-20 w-full items-center justify-center gap-2 sm:gap-3 bg-white text-rose-700 font-bold px-4 py-3 sm:py-4 rounded-xl hover:bg-rose-50 transition-colors shadow-md text-xs sm:text-base border border-white col-span-2 sm:col-span-1">
                 <Map className="w-4 h-4 sm:w-5 sm:h-5 text-rose-600 shrink-0" />
                 <span className="text-center leading-tight">Map Explorer</span>
               </Link>
@@ -340,7 +340,7 @@ export default function Home() {
               </div>
               
               <Link
-                href={`${BASE}/map`}
+                href={`${BASE}/centres?view=map`}
                 className="inline-flex items-center justify-center gap-2 bg-rose-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-rose-700 transition-colors shadow-sm text-sm"
               >
                 <Map className="w-4 h-4" />
@@ -354,7 +354,7 @@ export default function Home() {
               
               {/* Expand map floating action */}
               <Link 
-                href={`${BASE}/map`} 
+                href={`${BASE}/centres?view=map`} 
                 className="absolute top-3 right-3 z-[1000] bg-white/95 backdrop-blur text-rose-700 hover:text-white hover:bg-rose-600 font-bold px-3 py-1.5 rounded-lg shadow-md border border-rose-100 text-xs flex items-center gap-1.5 transition-all opacity-90 group-hover:opacity-100"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -423,7 +423,7 @@ export default function Home() {
         <p className="text-rose-400 text-xs">Data sourced from Ministry of Women & Child Development, Government of India. Not an official government website.</p>
         <div className="flex justify-center gap-6 mt-4">
           <Link href={`${BASE}/centres`} className="hover:text-white transition-colors">Find Centres</Link>
-          <Link href={`${BASE}/states`} className="hover:text-white transition-colors">By State</Link>
+          <Link href={`${BASE}/centres?view=states`} className="hover:text-white transition-colors">By State</Link>
           <a href="tel:181" className="hover:text-white transition-colors">Helpline 181</a>
         </div>
       </footer>

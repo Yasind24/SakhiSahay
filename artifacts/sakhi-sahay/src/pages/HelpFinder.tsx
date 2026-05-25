@@ -290,7 +290,7 @@ export default function HelpFinder() {
           </Link>
           <div className="flex items-center gap-4">
             <Link href={`${BASE}/centres`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">Find Centres</Link>
-            <Link href={`${BASE}/map`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">Map</Link>
+            <Link href={`${BASE}/centres?view=map`} className="text-sm font-medium text-rose-800 hover:text-rose-600 transition-colors hidden sm:block">Map</Link>
             <a href="tel:181" className="flex items-center gap-1.5 bg-rose-600 text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-rose-700 transition-colors shadow-sm">
               <Phone className="w-3.5 h-3.5" />
               181
