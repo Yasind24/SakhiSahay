@@ -375,6 +375,112 @@ export default function HelpFinder() {
                 </button>
               ))}
             </div>
+
+            {/* About Sakhi OSC Section */}
+            <div className="mt-6 bg-gradient-to-br from-white to-[hsl(350,100%,99%)] rounded-2xl border border-rose-100 p-6 shadow-sm space-y-6">
+              <div>
+                <h2 className="text-xl font-bold text-rose-950 mb-3 flex items-center gap-2">
+                  <Heart className="w-5 h-5 text-rose-500 fill-rose-500/20" />
+                  About Sakhi One Stop Centres (OSC)
+                </h2>
+                <p className="text-sm text-rose-800 leading-relaxed">
+                  One Stop Centres (OSC), popularly known as <strong>Sakhi Centres</strong>, form the cornerstone of India's safety response. Launched in <strong>2015</strong> under the Ministry of Women and Child Development (MWCD), this centrally-sponsored scheme is <strong>100% funded by the Nirbhaya Fund</strong>. Subsumed under the <strong>Sambal sub-scheme of Mission Shakti</strong>, these centres offer 24/7 immediate support, protection, and essential care to women facing gender-based violence, abuse, or distress under a single roof.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-extrabold text-rose-500 uppercase tracking-wider mb-3">Core Integrated Services</h3>
+                <div className="grid sm:grid-cols-2 gap-4 text-xs">
+                  <div className="space-y-3.5">
+                    <div className="flex gap-2">
+                      <span className="text-rose-500 text-sm shrink-0">🏥</span>
+                      <div>
+                        <strong className="text-rose-900 block font-bold mb-0.5">Medical Assistance</strong>
+                        <span className="text-rose-700 leading-relaxed">First aid, medical examinations, and direct referral linkages with general hospitals.</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-rose-500 text-sm shrink-0">👮</span>
+                      <div>
+                        <strong className="text-rose-900 block font-bold mb-0.5">Police Facilitation</strong>
+                        <span className="text-rose-700 leading-relaxed">Assistance in filing complaints (FIR/DIR) and police coordination in a safe environment.</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-rose-500 text-sm shrink-0">⚖️</span>
+                      <div>
+                        <strong className="text-rose-900 block font-bold mb-0.5">Legal Aid & Counselling</strong>
+                        <span className="text-rose-700 leading-relaxed">Free consult with legal aid advocates, rights education, and court process linkage.</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3.5">
+                    <div className="flex gap-2">
+                      <span className="text-rose-500 text-sm shrink-0">🧠</span>
+                      <div>
+                        <strong className="text-rose-900 block font-bold mb-0.5">Psycho-Social Support</strong>
+                        <span className="text-rose-700 leading-relaxed">Professional counselling to address trauma, stress, and provide emotional support.</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-rose-500 text-sm shrink-0">🏠</span>
+                      <div>
+                        <strong className="text-rose-900 block font-bold mb-0.5">Temporary Shelter</strong>
+                        <span className="text-rose-700 leading-relaxed">Immediate short-term refuge and basic care (food, clothing) for up to 5 days.</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="text-rose-500 text-sm shrink-0">👧</span>
+                      <div>
+                        <strong className="text-rose-900 block font-bold mb-0.5">Support for Minors</strong>
+                        <span className="text-rose-700 leading-relaxed">Coordinated care for girls under 18 in linkage with JJ Board and child welfare committees.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-rose-100 pt-5">
+                <h3 className="text-xs font-extrabold text-rose-500 uppercase tracking-wider mb-3">Key Features & Operations</h3>
+                <div className="grid sm:grid-cols-2 gap-4 text-xs">
+                  <div className="space-y-3">
+                    <div>
+                      <strong className="text-rose-950 font-bold block mb-1">Nirbhaya Fund Foundation</strong>
+                      <p className="text-rose-700 leading-relaxed">
+                        Funded entirely by the Nirbhaya Fund set up by the Government of India, ensuring dedicated, specialized centers equipped with medical, legal, and security staff in every district.
+                      </p>
+                    </div>
+                    <div>
+                      <strong className="text-rose-950 font-bold block mb-1">Integrated Single Window</strong>
+                      <p className="text-rose-700 leading-relaxed">
+                        Consolidates multiple safety agencies into one physical facility. This prevents secondary victimization by saving survivors from visiting multiple offices to get help.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <strong className="text-rose-950 font-bold block mb-1">Secure Video Conferencing</strong>
+                      <p className="text-rose-700 leading-relaxed">
+                        Equipped with secure online video recording. Survivors can record their statements for police and judicial magistrates directly from the OSC, avoiding intimidating courthouse visits.
+                      </p>
+                    </div>
+                    <div>
+                      <strong className="text-rose-950 font-bold block mb-1">Universal Helpline Linkage</strong>
+                      <p className="text-rose-700 leading-relaxed">
+                        Natively integrated with the Women Helpline (181) and Emergency Response Support System (112), allowing remote operators to instantly dispatch local OSC coordinators.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-rose-100 pt-5">
+                <h3 className="text-xs font-extrabold text-rose-500 uppercase tracking-wider mb-3">Who Can Access OSCs?</h3>
+                <p className="text-xs text-rose-700 leading-relaxed">
+                  <strong>Universal Eligibility:</strong> Any woman or girl facing violence, abuse, harassment, trafficking, cybercrime, or acid attacks is eligible for OSC support. Access is granted regardless of age, education, caste, marital status, background, or geographic origin. Girls under 18 receive coordinated support via child protection services (such as Childline 1098 and Child Welfare Committees) as guided by POCSO and Juvenile Justice regulations.
+                </p>
+              </div>
+            </div>
           </div>
 
           <aside className="lg:sticky lg:top-20 space-y-5">
