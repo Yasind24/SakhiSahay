@@ -109,11 +109,6 @@ const officialLinks = [
     href: "https://spniwcd.wcd.gov.in/one-stop-centre-header/documents",
     detail: "Guidelines and functional OSC directory documents.",
   },
-  {
-    label: "PIB OSC Note",
-    href: "https://www.pib.gov.in/Pressreleaseshare.aspx?PRID=1706000",
-    detail: "Official service summary from MWCD.",
-  },
 ];
 
 const helplines = [
