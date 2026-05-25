@@ -355,7 +355,7 @@ export default function Home() {
               {/* Expand map floating action */}
               <Link 
                 href={`${BASE}/centres?view=map`} 
-                className="absolute top-3 right-3 z-[1000] bg-white/95 backdrop-blur text-rose-700 hover:text-white hover:bg-rose-600 font-bold px-3 py-1.5 rounded-lg shadow-md border border-rose-100 text-xs flex items-center gap-1.5 transition-all opacity-90 group-hover:opacity-100"
+                className="absolute top-14 sm:top-3 right-3 z-[1000] bg-white/95 backdrop-blur text-rose-700 hover:text-white hover:bg-rose-600 font-bold px-3 py-1.5 rounded-lg shadow-md border border-rose-100 text-xs flex items-center gap-1.5 transition-all opacity-90 group-hover:opacity-100"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 Expand View
